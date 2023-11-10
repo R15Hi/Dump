@@ -1,0 +1,26 @@
+name: download-and-upload-assets
+on:
+  workflow_dispatch:
+    inputs:
+      download_link:
+        description: 'Download link of the file'
+        required: true
+      file_name:
+        description: 'Name of the file'
+        required: true
+
+jobs:
+  download-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download file
+        run: |
+          wget -O "${{ github.event.inputs.file_name }}" "${{ github.event.inputs.download_link }}"
+
+      - name: Upload file to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ secrets.UPLOAD_URL }}
+          asset_path: "${{ github.event.inputs.file_name }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
